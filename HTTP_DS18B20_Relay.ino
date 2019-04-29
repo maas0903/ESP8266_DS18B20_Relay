@@ -11,7 +11,7 @@
  *   const char* ssid = "yourn ssid";  // Enter SSID here
  *   const char* password = "your password";  //Enter Password here
  *   
- *   Edit config.h in the same folder as the ino file to contain the sensor device id and min and max temperatures. For example,
+ *   Create and edit config.h in the same folder as the ino file to contain the sensor device id and min and max temperatures. For example,
  *   //Sensor ids
  *   uint8_t sensor1[8] = {0x28, 0xFF, 0x75, 0x57, 0x80, 0x16, 0x04, 0xEC};
  *   float maxTemp = 22;
@@ -33,6 +33,8 @@ float tempSensor1;
 boolean goingUp = false;
 String statusStr = "";
 int deviceCount = 0;
+long counter = 0;
+
 DeviceAddress Thermometer;
 
 ESP8266WebServer server(80);             
@@ -53,6 +55,12 @@ void setup()
 {
   Serial.begin(115200);
   pinMode(RELAY_BUS, OUTPUT);
+  digitalWrite(RELAY_BUS, HIGH);
+  /*delay(2000);
+  digitalWrite(RELAY_BUS, 1);
+  delay(2000);
+  digitalWrite(RELAY_BUS, 0);
+  delay(2000);*/
 
   delay(100);
   
@@ -97,6 +105,11 @@ void setup()
 
 void loop() 
 {
+  if(counter > 10000000)
+  {
+    counter = 0;
+  }
+  counter = counter + 1;
   server.handleClient();
 }
 
@@ -135,6 +148,7 @@ void handle_OnConnect() {
     }
   }
 
+  statusStr = String(counter)+" - " + statusStr;
     server.send(200, "text/html", SendHTML(tempSensor1, statusStr)); 
     
 }
